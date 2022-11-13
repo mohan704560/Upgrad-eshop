@@ -50,6 +50,30 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+const userType=(user)=>{
+  
+  if(user==="Admin"){
+    return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+      <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
+      <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Add Product</Button>
+      <Button variant="contained" color='error'>Logout</Button>
+    </Box>
+  }
+  else if(user==="SignedUser"){
+    return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+      <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
+      <Button variant="contained" color='error'>Logout</Button>
+    </Box>
+  }
+  else{
+    return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+      <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
+      <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Sign Up</Button>
+    </Box>
+  }
+
+}
+
 export default function PrimarySearchAppBar() {
 
   const Signup = true;
@@ -87,29 +111,8 @@ export default function PrimarySearchAppBar() {
             />
           </Search>
         </Box>
-            if(true){
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
-            <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Add Product</Button>
-            <Button variant="contained" color='error'>Logout</Button>
-          </Box>
-        }
-        else if(Admin){
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
-            <Button variant="contained" color='error'>Logout</Button>
-          </Box>
-        }
-        else{
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
-            <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Add Product</Button>
-            <Button variant="contained" color='error'>Logout</Button>
-          </Box>
-        }
+         {userType("SignIn")}
       </Toolbar>
     </AppBar>
-
-    // </Box>
   );
 }
