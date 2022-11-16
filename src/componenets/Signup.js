@@ -10,12 +10,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from 'axios';
 
 function Copyright(props) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
             {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
+            <Link color="inherit" href="/">
                 upGrad
             </Link>{' '}
             {new Date().getFullYear()}
@@ -27,13 +28,33 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function Signup() {
-    const handleSubmit = (event) => {
+    const handleSubmit = async(event) => {
         event.preventDefault();
+
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+
+        if(data.get("password")!==data.get("Confirm_Password")){
+               alert("The password entered are not match");
+        }
+        else{
+            const formData={
+                first_name: data.get("first_name"),
+                last_name:data.get("last_name"),
+                email:data.get("email"),
+                password:data.get("password"),
+                phone_number:data.get("phone_number")
+            };
+           
+            const res = await axios.post("/users",formData); 
+
+            if(res.data.success){
+                window.location.href="/";
+            }
+            else{
+                alert(res.data.Response);
+            }
+        }
+
     };
 
     return (
@@ -54,14 +75,15 @@ export default function Signup() {
                     <Typography component="h1" variant="h5">
                         Sign up
                     </Typography>
-                    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                         <TextField
                             margin="normal"
                             required
                             fullWidth
                             id="outlined"
                             label="First Name"
-                            name="First Name"
+                            name="first_name"
+                            type="text"
                         />
                         <TextField
                             margin="normal"
@@ -69,7 +91,8 @@ export default function Signup() {
                             fullWidth
                             id="outlined"
                             label="Last Name"
-                            name="Last Name"
+                            name="last_name"
+                            type="text"
                         />
                         <TextField
                             margin="normal"
@@ -77,7 +100,7 @@ export default function Signup() {
                             fullWidth
                             id="email"
                             label="Email Address"
-                            name="Email Address"
+                            name="email"
                         />
                         <TextField
                             margin="normal"
@@ -93,7 +116,7 @@ export default function Signup() {
                             margin="normal"
                             required
                             fullWidth
-                            name="Confirm Password"
+                            name="Confirm_Password"
                             label="Confirm Password"
                             type="password"
                             id="password"
@@ -102,7 +125,7 @@ export default function Signup() {
                             margin="normal"
                             required
                             fullWidth
-                            name="Conctact Number"
+                            name="phone_number"
                             label="Conctact Number"
                             type="number"
                             id="number"
@@ -112,12 +135,13 @@ export default function Signup() {
                             fullWidth
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
+                            href=""
                         >
                             Sign up
                         </Button>
                         <Grid container>
                             <Grid item>
-                                <Link href="#" variant="body2">
+                                <Link href="/Sign_In" variant="body2">
                                     {"Already have an account? Sign in"}
                                 </Link>
                             </Grid>

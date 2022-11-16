@@ -9,12 +9,23 @@ import SignIn from './componenets/SignIn';
 // import Order from './componenets/Order';
 // import ModifyProduct from './componenets/ModifyProduct'
 // import AddProduct from './componenets/AddProduct';
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
+import Page_Signin from './componenets/Page_Signin';
+import Page_Signup from './componenets/Page_Signup';
+import Page_HomePage from './componenets/Page_HomePage';
 
 function App() {
   return (
     <>
-      <PrimarySearchAppBar/>
-      <SignIn/>
+    <Router>
+      <Routes>
+        <Route exact path="/" element={<Page_HomePage/>}/>
+        <Route exact path="/Sign_In" element={<Page_Signin/>}/>
+        <Route exact path="/Sign_up" element={ <Page_Signup/>}/>
+      </Routes>
+    </Router>
+      
+     
       {/* <Signup/>
       <UserCard/>
       <AdminCard/>

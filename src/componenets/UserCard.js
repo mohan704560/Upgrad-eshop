@@ -7,7 +7,7 @@ import { Button, CardActionArea, CardActions, Grid, Toolbar } from '@mui/materia
 
 export default function UserCard() {
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ width: 345, ml:2 ,mr:2,mb:3 }}>
       <CardActionArea>
         <CardMedia
           component="img"
