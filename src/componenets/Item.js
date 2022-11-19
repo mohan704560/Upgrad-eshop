@@ -5,19 +5,24 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Stack } from '@mui/system';
+import { useSelector } from 'react-redux';
 
 const ProducDetail = () => {
+
+    const product = useSelector((state)=>state.productDetail);
+    const quantity = useSelector((state)=>state.quantity);
+
     return (
         <>
             <Grid container>
                 <Grid item xs={6} container justifyContent="flex-end">
-                    <img src="https://onecomm.bm/wp-content/uploads/2021/01/Screen-Shot-2021-01-29-at-11.23.16-AM.jpg" alt="iphone 12" height={500} width={500} />
+                    <img src={product.inmage_url} alt={product.name} height={500} width={500} />
                 </Grid>
                 <Grid item container xs={6}>
                     <Stack>
                         <CardContent>
                             <Typography sx={{ fontSize: 30 }} >
-                                iPhone 12
+                            {product.name}
                             </Typography>
                             <br/>
                             <Stack direction="row">
@@ -25,7 +30,7 @@ const ProducDetail = () => {
                                     Quantity:
                                 </Typography>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                                    1
+                                    {quantity}
                                 </Typography>
                                 </Stack>
                                 <br/>
@@ -34,16 +39,16 @@ const ProducDetail = () => {
                                     Catagory:
                                 </Typography>
                                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                                    Electronics
+                                    {product.catagory}
                                 </Typography>
                             </Stack>
                             <br />
                             <Typography variant='subtitle1'>
-                                Detail description about product
+                                {product.description}
                             </Typography>
                             <br />
                             <Typography variant="h5" color="error">
-                               Total Price : ₹ 10000
+                               Total Price : ₹ {quantity*product.price.$numberDecimal}
                             </Typography>
                             <br />
                         </CardContent>

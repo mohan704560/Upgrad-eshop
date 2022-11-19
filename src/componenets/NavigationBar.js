@@ -9,6 +9,10 @@ import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Button } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -50,34 +54,56 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const userType=(user)=>{
-  
-  if(user==="Admin"){
-    return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-      <Button href="/" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
-      <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Add Product</Button>
-      <Button variant="contained" color='error'>Logout</Button>
-    </Box>
-  }
-  else if(user==="SignedUser"){
-    return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-      <Button href="/" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
-      <Button variant="contained" color='error'>Logout</Button>
-    </Box>
-  }
-  else{
-    return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-      <Button href="/" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'none' }}>Home</Button>
-      <Button href="/Sign_In" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Sign In</Button>
-      <Button href="/Sign_up" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Sign Up</Button>
-    </Box>
-  }
-
-}
-
 export default function PrimarySearchAppBar() {
 
-  const Signup = true;
+  const LoginStatus = useSelector((state) => state.isLogged);
+  const UserType = useSelector((state) => state.userType);
+  const searchValue = useSelector((state) => state.searchValue);
+  const dispatch = useDispatch();
+
+  const searchhander = (event) => {
+
+    dispatch({ type: "SearchChange", payload: event.target.value })
+
+  }
+
+  const logoutHandler = async () => {
+
+    const response = await axios.get("/logout");
+    dispatch({type:"loginStatus", payload:false});
+  
+  }
+
+  const userType = (LoginStatus, UserType) => {
+
+    if (LoginStatus) {
+  
+      if (UserType === "Admin") {
+        return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Link to="/"><Button sx={{ textDecorationLine: "underline", textTransform: 'none' , color: "white"}}>Home</Button></Link>
+          <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Add Product</Button>
+          <Button variant="contained" color='error' onClick={logoutHandler}>Logout</Button>
+        </Box>
+      }
+      else {
+        return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Link to="/"><Button sx={{ textDecorationLine: "underline", textTransform: 'none', color: "white" }}>Home</Button></Link>
+          <Button variant="contained" color='error' onClick={logoutHandler}>Logout</Button>
+        </Box>
+      }
+  
+    }
+    else {
+  
+      return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+        <Link to="/"><Button sx={{ textDecorationLine: "underline", textTransform: 'none', color: "white" }}>Home</Button></Link>
+        <Link to="/Sign_In"><Button sx={{ textDecorationLine: "underline", textTransform: 'capitalize', color: "white" }}>Sign In</Button></Link>
+        <Link to="/Sign_up"><Button sx={{ textDecorationLine: "underline", textTransform: 'capitalize', color: "white" }}>Sign Up</Button></Link>
+      </Box>
+  
+    }
+  
+  }
 
   return (
     <AppBar position="static" fullwidth >
@@ -109,10 +135,11 @@ export default function PrimarySearchAppBar() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              onChange={searchhander}
             />
           </Search>
         </Box>
-         {userType("SignIn")}
+        {userType(LoginStatus, UserType)}
       </Toolbar>
     </AppBar>
   );

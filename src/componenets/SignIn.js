@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import axios from 'axios';
+import { useNavigate } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Copyright(props) {
   return (
@@ -29,13 +31,19 @@ const theme = createTheme();
 
 export default function SignIn() {
 
+  const Navigate=useNavigate();
+  const dispatch = useDispatch();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const signIndata = new FormData(event.currentTarget);
 
     try {
-      const res = await axios.post("/auth", { email: data.get('email'), password: data.get('password') });
-      window.location.href = "/";
+      const res = await axios.post("/auth", { email: signIndata.get('email'), password: signIndata.get('password') });
+      dispatch({type:"loginStatus" , payload:true});
+      const userType=res.data.data.role;
+      dispatch({type:userType});
+      Navigate("/");
     }
     catch (error) {
       alert(error.response.data.Response);
@@ -90,8 +98,8 @@ export default function SignIn() {
               Sign In
             </Button>
             <Grid container>
-              <Grid item>
-                <Link href="#" variant="body2">
+              <Grid item> 
+                <Link href="/Sign_up" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

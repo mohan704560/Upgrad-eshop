@@ -2,23 +2,50 @@ import PrimarySearchAppBar from "./NavigationBar";
 import UserCard from "./UserCard";
 import ToggleButton from "./ToggleButton"
 import { Typography } from "@mui/material";
-import React from 'react';
-import Box from '@mui/material/Box';
+import React, { useEffect } from 'react';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { Stack } from "@mui/system";
-
-const ProductArray = [1, 2, 3, 4, 5, 6, 7, 8]
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 
 function Page_HomePage() {
 
-    const [age, setAge] = React.useState('');
+    const sortBy = useSelector((state) => state.sortBy);
+    const dispatch = useDispatch()
+    const state = useSelector((state) => state);
+    var products = useSelector((state) => state.productArray);
 
     const handleChange = (event) => {
-        setAge(event.target.value);
+
+        dispatch({ type: "changeSort", payload: event.target.value });
     };
+
+    const fetchProduct = async (state) => {
+
+        const response = await axios.get(`/products?catagory=${state.catagory}&name=${state.searchValue}&SortBy=${state.sortBy}`);
+        dispatch({ type: "ChangeProduct", payload: response.data });
+
+        try {
+            const Userstatus = await axios.get("/auth");
+            if (Userstatus.data.success) {
+                dispatch({ type: Userstatus.data.data.role });
+                dispatch({ type: "loginStatus", payload: true });
+            }
+        } catch (err) {
+            console.log("Please login to use website");
+        }
+    }
+
+    useEffect(() => {
+
+        fetchProduct(state);
+
+    }, [state.catagory, state.searchValue, state.sortBy]);
+
 
     return (
         <>
@@ -30,24 +57,24 @@ function Page_HomePage() {
                 <Select
                     labelId="demo-simple-select-label"
                     id="demo-simple-select"
-                    value={age}
+                    value={sortBy}
                     label="Sort By"
                     onChange={handleChange}
-                    sx={{width:300}}
+                    sx={{ width: 300 }}
                 >
-                    <MenuItem value={10}>Default</MenuItem>
-                    <MenuItem value={20}>Price: High to Low</MenuItem>
-                    <MenuItem value={30}>Price: Low to High</MenuItem>
-                    <MenuItem value={10}>Newest</MenuItem>
+                    <MenuItem value="Default">Default</MenuItem>
+                    <MenuItem value="PriceDesending">Price: High to Low</MenuItem>
+                    <MenuItem value="PriceAscending">Price: Low to High</MenuItem>
+                    <MenuItem value="Newest">Newest</MenuItem>
                 </Select>
-                <br/>
+                <br />
             </FormControl>
-            <Stack direction="row" sx={{flexWrap:"wrap"}}>
-            {
-                ProductArray.map((product) => {
-                    return <UserCard />
-                })
-            }
+            <Stack direction="row" sx={{ flexWrap: "wrap" }}>
+                {
+                    products.map((product, index) => {
+                        return <UserCard key={index} id={product._id} inmage_url={product.inmage_url} name={product.name} price={product.price.$numberDecimal} description={product.description} />
+                    })
+                }
             </Stack>
         </>
     )
