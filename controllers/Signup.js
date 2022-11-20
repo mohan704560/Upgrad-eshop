@@ -19,13 +19,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-// const AddData=()=>{
-//   UserData.map((user)=>{
-//     eshop_shopping_address.create(user);
-//   })};
-
-//   AddData();
-
 const hashing = async (password) => {
   return await bcrypt.hash(password, 8);
 }
@@ -51,7 +44,7 @@ app.post("/users", async (req, res) => {
   else if (email.indexOf("@") < 1 || email.indexOf(".") < 3 || (email.length - 1 - email.indexOf(".")) < 2 || (email.length - 1 - email.indexOf(".")) > 5) {
     res.status(400).json({ success: false, Response: "Invalid email-id format!" });
   }
-  else if (contact_number.toString().length < 10) {
+  else if (contact_number.toString().length !== 10) {
     res.status(400).json({ success: false, Response: "Invalid contact number!" });
   }
   else {
@@ -68,7 +61,7 @@ app.post("/auth", async (req, res) => {
   const data = await eshop_user.findOne({ email: SignINDetail.email });
 
   if (!data) {
-    res.status(401).json({ success: false, Response: "This eamil has not been registered!" });
+    res.status(401).json({ success: false, Response: "This email has not been registered!" });
   }
   else {
 
@@ -79,17 +72,186 @@ app.post("/auth", async (req, res) => {
     }
     else {
       res.cookie("ehop", {
-        Token: createToken(req.body.email),
-        expire: new Date(Date.now() + 3600000),
-      })
-      res.status(200).send({ success: true, response: "Authorise to use web application" });
-      console.log(req.body);
+        Token: createToken(SignINDetail.email),
+      }, { expire: Date.now() + 3600000 });
+      res.status(200).send({success: true, response: "Authorise to use web application" ,data:data });
     }
   }
 })
 
+app.get("/auth",Auth,async(req,res)=>{
+
+  try{
+  const token = req.cookies.ehop;
+    const varifyUser = jwt.verify(token.Token, "987654321123456789");
+    const userDetail = await eshop_user.findOne({ email: varifyUser.email });
+   res.status(200).send({success:true,Response:"you are authorised", data:userDetail});
+  }catch(err){
+
+  res.status(401).send({success:false, Response:"Login required"});
+
+  }
+})
+
+app.post("/addresses", Auth, async (req, res) => {
+
+  const addressDetail = req.body;
+  const AddZipcode = addressDetail.zipcode;
+  const AddPhone = addressDetail.phone;
+
+  if (AddZipcode.toString().length !== 6 || !parseInt(AddZipcode)) {
+    res.status(400).json({ success: false, Response: "Invalid zip code!" });
+  }
+  else if (AddPhone.toString().length !== 10 || !parseInt(AddPhone)) {
+    res.status(400).json({ success: false, Response: "Invalid contact number!" });
+  }
+  else {
+    const address = await eshop_shopping_address.create(addressDetail);
+    const token = req.cookies.ehop;
+    const varifyUser = jwt.verify(token.Token, "987654321123456789");
+    const userDetail = await eshop_user.findOne({ email: varifyUser.email });
+    address.user_id = userDetail._id;
+    address.save();
+    res.status(200).send({ success: true, Response: address });
+  }
+})
+
+app.get("/products", async (req, res) => {
+
+  const data = req.query;
+  const searchString = `${data.catagory}+${data.SortBy}`;
+
+  if (!data.name) {
+
+    switch (searchString) {
+      case "ALL+Default": products = await eshop.find(); break;
+      case "ALL+PriceDesending": products = await eshop.find().sort({ price: -1 }); break;
+      case "ALL+PriceAscending": products = await eshop.find().sort({ price: 1 }); break;
+      case 'ALL+Newest': products = await eshop.find().sort({ created: 1 }); break;
+      case "Apparel+Default": products = await eshop.find({ catagory: "Apparel" }); break;
+      case "Apparel+PriceDesending": products = await eshop.find({ catagory: "Apparel" }).sort({ price: -1 }); break;
+      case "Apparel+PriceAscending": products = await eshop.find({ catagory: "Apparel" }).sort({ price: 1 }); break;
+      case 'Apparel+Newest': products = await eshop.find({ catagory: "Apparel" }).sort({ created: 1 }); break;
+      case "Electronic+Default": products = await eshop.find({ catagory: "Electronic" }); break;
+      case "Electronic+PriceDesending": products = await eshop.find({ catagory: "Electronic" }).sort({ price: -1 }); break;
+      case "Electronic+PriceAscending": products = await eshop.find({ catagory: "Electronic" }).sort({ price: 1 }); break;
+      case 'Electronic+Newest': products = await eshop.find({ catagory: "Electronic" }).sort({ created: 1 }); break;
+      case "Personal Care+Default": products = await eshop.find({ catagory: "Personal Care" }); break;
+      case "Personal Care+PriceDesending": products = await eshop.find({ catagory: "Personal Care" }).sort({ price: -1 }); break;
+      case "Personal Care+PriceAscending": products = await eshop.find({ catagory: "Personal Care" }).sort({ price: 1 }); break;
+      case 'Personal Care+Newest': products = await eshop.find({ catagory: "Personal Care" }).sort({ created: 1 }); break;
+
+        Default: products = [];
+    }
+  }
+  else {
+    products = await eshop.find({ name: data.name });
+  }
+
+  res.status(200).json(products); 
+
+}) 
+
+app.get("/products/categories", (req, res) => {
+
+  const catagory = ["ALL", "Apparel", "Electronic", "Personal Care"];
+  res.status(200).json({ success: true, Response: catagory });
+
+});
+
+app.get("/products/:id", async (req, res) => {
+
+  try {
+    const product = await eshop.findOne({ _id: req.params.id });
+    res.status(200).send({ success: true, Response: product });
+  } catch (err) {
+    res.status(400).send({ success: false, Response: `No Product found for ID - ${req.params}` })
+  }
+
+})
+
+app.post("/products", Auth, async (req, res) => {
+
+  const product = req.body;
+  const token = req.cookies.ehop;
+  const varifyUser = jwt.verify(token.Token, "987654321123456789");
+  const userDetail = await eshop_user.findOne({ email: varifyUser.email });
+
+  if(userDetail.role==="Admin"){
+
+    const newProduct = await eshop.create(product);
+    res.status(200).json({success:true,Response:"Product Added successfullt"});
+
+  }else{
+    res.status(401).json({success:false,Response:"You are not authorized to access this endpoint"});
+  }
+})
+
+app.put("/products/:id",Auth,async(req,res)=>{
+
+  const product= req.body;
+  const ID = req.params;
+  const token = req.cookies.ehop;
+  const varifyUser = jwt.verify(token.Token, "987654321123456789");
+  const userDetail = await eshop_user.findOne({ email: varifyUser.email });
+
+  if(userDetail.role==="Admin"){
+
+    const newProduct = await eshop.updateOne({_id:ID},product);
+    res.status(200).json({success:true,Response:"Product updated successfully"});
+
+  }else{
+    res.status(401).json({success:false,Response:"You are not authorized to access this endpoint"});
+  }
+
+})
+
+app.delete("/products/:id",Auth,async(req,res)=>{
+
+  const ID = req.params;
+  const token = req.cookies.ehop;
+  const varifyUser = jwt.verify(token.Token, "987654321123456789");
+  const userDetail = await eshop_user.findOne({ email: varifyUser.email });
+
+  if(userDetail.role==="Admin"){
+
+    const newProduct = await eshop.deleteOne({_id:ID});
+    res.status(200).json({success:true,Response:`Product with ${ID} Deleted successfully!`});
+
+  }else{
+    res.status(401).json({success:false,Response:"You are not authorized to access this endpoint"});
+  }
+
+})
+
+app.post("/orders",Auth,async(req,res)=>{
+
+  const Data = req.body;
+  const token = req.cookies.ehop;
+  const varifyUser = jwt.verify(token.Token, "987654321123456789");
+  const userDetail = await eshop_user.findOne({ email: varifyUser.email });
+
+  if(userDetail.role==="User"){
+
+    const newProduct = await eshop_order.create(Data);
+    res.status(200).json({success:true,Response:`Product with ${ID} Deleted successfully!`});
+
+  }else{
+    res.status(401).json({success:false,Response:"You are not authorized to access this endpoint"});
+  }
+
+})
+
+app.get("/logout",(req,res)=>{
+
+res.clearCookie("ehop");
+res.status(200).json({success:true,Response:"You are successfully logout"});
+
+})
+
+
 app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../routes/DeleteForm.html"));
+  res.status(200).send("<h1>Welcome to Eshop Backend</h1>");
 });
 
 app.listen(5000, () => {
