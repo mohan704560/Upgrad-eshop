@@ -81,7 +81,7 @@ export default function PrimarySearchAppBar() {
       if (UserType === "Admin") {
         return <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
           <Link to="/"><Button sx={{ textDecorationLine: "underline", textTransform: 'none' , color: "white"}}>Home</Button></Link>
-          <Button href="#text-buttons" color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize' }}>Add Product</Button>
+          <Link to="/AddProduct"><Button color='inherit' sx={{ textDecorationLine: "underline", textTransform: 'capitalize', color: "white" }}>Add Product</Button></Link>
           <Button variant="contained" color='error' onClick={logoutHandler}>Logout</Button>
         </Box>
       }

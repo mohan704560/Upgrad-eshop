@@ -10,14 +10,23 @@ import { useDispatch, useSelector } from 'react-redux';
 
 function AddressDetail() {
 
-    const address=useSelector((state)=>state.addressDetail);
+    var address = useSelector((state) => state.addressDetail);
     const dispatch = useDispatch();
+    console.log(address);
 
     // const [age, setAge] = React.useState('');
 
     // const handleChange = (event) => {
     //     setAge(event.target.value);
     // };
+
+    const isaddress = (address) => {
+        if (!address.city) {
+            return <MenuItem value={address}>No Saved address</MenuItem>
+        } else {
+            return <MenuItem value={address}>{`${address.city} ${address.landmark} ${address.street} ${address.state} ${address.zipcode}`}</MenuItem>
+        }
+    }
 
     const formhandler = async (event) => {
 
@@ -36,8 +45,7 @@ function AddressDetail() {
 
         try {
             const res = await axios.post("/addresses", formData);
-            dispatch({type:"Addaddress",payload:res.data.Response});
-            console.log(res.data.Response);
+            dispatch({ type: "Addaddress", payload: res.data.Response });
         }
         catch (error) {
             alert(error.response.data.Response);
@@ -46,26 +54,26 @@ function AddressDetail() {
     }
 
     return (
-            <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} >
-                <FormControl>
-                    <InputLabel id="demo-simple-select-label" >Select Address</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={address}
-                        label="Select Address"
-                        // onChange={handleChange}
-                        sx={{ width: 600 }}
-                    >
-                        <MenuItem value={address}>{`${address.city} ${address.landmark} ${address.street} ${address.state} ${address.zipcode}`}</MenuItem>
-                    </Select>
-                    <br />
-                    <Typography sx={{ textAlign: 'center' }}>-OR-</Typography>
-                    <br />
-                    <Typography variant='h5' sx={{ textAlign: 'center' }}>Add Address</Typography>
-                    <br />
-                </FormControl>
-                <Box component="form" onSubmit={formhandler} >
+        <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} >
+            <FormControl>
+                <InputLabel id="demo-simple-select-label" >Select Address</InputLabel>
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={address}
+                    label="Select Address"
+                    // onChange={handleChange}
+                    sx={{ width: 600 }}
+                >
+                {isaddress(address)}
+                </Select>
+                <br />
+                <Typography sx={{ textAlign: 'center' }}>-OR-</Typography>
+                <br />
+                <Typography variant='h5' sx={{ textAlign: 'center' }}>Add Address</Typography>
+                <br />
+            </FormControl>
+            <Box component="form" onSubmit={formhandler} >
                 <FormControl>
                     <TextField
                         required
@@ -112,9 +120,9 @@ function AddressDetail() {
                     />
                     <br />
                     <Button variant="contained" type="submit">Save Address</Button>
-                    </FormControl>
-                </Box>
-            </Container>
+                </FormControl>
+            </Box>
+        </Container>
     )
 }
 

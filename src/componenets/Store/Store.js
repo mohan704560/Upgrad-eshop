@@ -10,6 +10,7 @@ const initials={
     productDetail:{},
     quantity:0,
     addressDetail:{},
+    editProductID:'',
 }
 
 function shopReducer(state=initials,action){
@@ -26,6 +27,7 @@ function shopReducer(state=initials,action){
     case 'Updateproduct' : return {...state,productDetail:action.payload};
     case 'updateQuantity' : return {...state,quantity:action.payload};
     case 'Addaddress' : return {...state,addressDetail:action.payload};
+    case 'AddEditProductId': return {...state,editProductID:action.payload};
 
     default:return state;
    }

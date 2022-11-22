@@ -11,6 +11,7 @@ import { Stack } from "@mui/system";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import AdminCard from "./AdminCard";
 
 function Page_HomePage() {
 
@@ -18,6 +19,7 @@ function Page_HomePage() {
     const dispatch = useDispatch()
     const state = useSelector((state) => state);
     var products = useSelector((state) => state.productArray);
+    const userType=useSelector((state)=>state.userType);
 
     const handleChange = (event) => {
 
@@ -44,7 +46,7 @@ function Page_HomePage() {
 
         fetchProduct(state);
 
-    }, [state.catagory, state.searchValue, state.sortBy]);
+    }, [state.catagory, state.searchValue, state.sortBy,]);
 
 
     return (
@@ -70,10 +72,17 @@ function Page_HomePage() {
                 <br />
             </FormControl>
             <Stack direction="row" sx={{ flexWrap: "wrap" }}>
-                {
+                { userType==="Admin"?
+                   ( 
                     products.map((product, index) => {
-                        return <UserCard key={index} id={product._id} inmage_url={product.inmage_url} name={product.name} price={product.price.$numberDecimal} description={product.description} />
+                        return <AdminCard key={index} id={product._id} inmage_url={product.inmage_url} name={product.name} price={product.price.$numberDecimal} description={product.description} />
                     })
+                    ):
+                    (
+                        products.map((product, index) => {
+                            return <UserCard key={index} id={product._id} inmage_url={product.inmage_url} name={product.name} price={product.price.$numberDecimal} description={product.description} />
+                        }) 
+                    )
                 }
             </Stack>
         </>

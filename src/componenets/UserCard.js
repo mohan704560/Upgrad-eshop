@@ -22,7 +22,7 @@ export default function UserCard({id,inmage_url,name,price,description}) {
   }
 
   return (
-    <Card sx={{ width: 345, ml:2 ,mr:2,mb:3 }}>
+    <Card sx={{ width: 345, ml:2 ,mr:2,mb:3 , display:"flex", flexDirection:'column', justifyContent:'space-between' }}>
       <CardActionArea>
         <CardMedia
           component="img"
@@ -49,7 +49,7 @@ export default function UserCard({id,inmage_url,name,price,description}) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button variant="contained" size="small" color="primary" onClick={buyhandler}>
+        <Button variant="contained" size="small" color="primary" onClick={buyhandler} sx={{}}>
           Buy
         </Button>
       </CardActions>

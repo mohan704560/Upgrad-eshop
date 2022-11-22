@@ -12,6 +12,7 @@ import ConfirmOrder from './ConfirmOrder';
 import PrimarySearchAppBar from "./NavigationBar";
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 const steps = ['Items', 'Select Address', 'Confirm Order'];
 
@@ -20,6 +21,8 @@ export default function HorizontalLinearStepper() {
   const [skipped, setSkipped] = React.useState(new Set());
   const address = useSelector((state) => state.addressDetail);
   const productDetail=useSelector((state)=>state.productDetail);
+  const quantity = useSelector((state)=>state.quantity);
+  const navigate = useNavigate();
 
   const isStepSkipped = (step) => {
     return skipped.has(step);
@@ -29,11 +32,25 @@ export default function HorizontalLinearStepper() {
     let newSkipped = skipped;
 
     if(activeStep===steps.length-1){
+
+      const orderDetail = {
+        shipping_address_id:address._id,
+        product_product_id:productDetail._id,
+        quatity:quantity
+      }
      
-      const res = await axios.post("/orders") 
-  
+      try{
+        const res = await axios.post("/orders",orderDetail) ;
+        alert(res.data.Response);
+
+      }
+      catch(err){
+
+        alert(err.response.data.Response);
+      }
+      navigate("/");
     }
-    if (activeStep === 1 && !address) {
+    if (activeStep === 1 && !address.city) {
       alert("Please select address!");
     } else {
 
@@ -78,17 +95,6 @@ export default function HorizontalLinearStepper() {
             );
           })}
         </Stepper>
-        {activeStep === steps.length ? (
-          <React.Fragment>
-            <Typography sx={{ mt: 2, mb: 1 }}>
-              All steps completed - you&apos;re finished
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-              <Box sx={{ flex: '1 1 auto' }} />
-              <Button onClick={handleReset}>Reset</Button>
-            </Box>
-          </React.Fragment>
-        ) : (
           <React.Fragment>
             {OrderBody()}
             <Stack direction='row' sapcing={1} justifyContent='center' sx={{ mt: 5 }}>
@@ -105,7 +111,6 @@ export default function HorizontalLinearStepper() {
               </Button>
             </Stack>
           </React.Fragment>
-        )}
       </Box>
     </>
   );
