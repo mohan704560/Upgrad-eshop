@@ -4,7 +4,7 @@ const usersSchema = require("./usersSchema");
 const productsSchema = require("./productsSchema");
 
 const ordersSchema = new mongoose.Schema({
-    amount:mongoose.Schema.Types.Decimal128,
+    quatity:Number,
     order_date:{
         type:Date,
         default:Date.now,

@@ -180,7 +180,7 @@ app.post("/products", Auth, async (req, res) => {
   if(userDetail.role==="Admin"){
 
     const newProduct = await eshop.create(product);
-    res.status(200).json({success:true,Response:"Product Added successfullt"});
+    res.status(200).json({success:true,Response:"Product Added successfully"});
 
   }else{
     res.status(401).json({success:false,Response:"You are not authorized to access this endpoint"});
@@ -190,7 +190,7 @@ app.post("/products", Auth, async (req, res) => {
 app.put("/products/:id",Auth,async(req,res)=>{
 
   const product= req.body;
-  const ID = req.params;
+  const ID = req.params.id;
   const token = req.cookies.ehop;
   const varifyUser = jwt.verify(token.Token, "987654321123456789");
   const userDetail = await eshop_user.findOne({ email: varifyUser.email });
@@ -208,7 +208,7 @@ app.put("/products/:id",Auth,async(req,res)=>{
 
 app.delete("/products/:id",Auth,async(req,res)=>{
 
-  const ID = req.params;
+  const ID = req.params.id;
   const token = req.cookies.ehop;
   const varifyUser = jwt.verify(token.Token, "987654321123456789");
   const userDetail = await eshop_user.findOne({ email: varifyUser.email });
@@ -230,14 +230,24 @@ app.post("/orders",Auth,async(req,res)=>{
   const token = req.cookies.ehop;
   const varifyUser = jwt.verify(token.Token, "987654321123456789");
   const userDetail = await eshop_user.findOne({ email: varifyUser.email });
+  const OrderDetail={...Data,user_id:userDetail._id}
 
-  if(userDetail.role==="User"){
+  if(varifyUser){
 
-    const newProduct = await eshop_order.create(Data);
-    res.status(200).json({success:true,Response:`Product with ${ID} Deleted successfully!`});
+    if(userDetail.role==="USER"){
+
+      const newProduct = await eshop_order.create(OrderDetail);
+      res.status(200).json({success:true,Response:`Order place successfully with id ${newProduct._id}`});
+
+    }
+    else{
+ 
+      res.status(401).json({success:false,Response:"You are not authorized to access this endpoint"});
+
+    }
 
   }else{
-    res.status(401).json({success:false,Response:"You are not authorized to access this endpoint"});
+    res.status(401).json({success:false,Response:"Please login first to access this endpoint"});
   }
 
 })
