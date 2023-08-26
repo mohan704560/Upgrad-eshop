@@ -4,8 +4,8 @@
   "description": "Upgrad shopping plateform",
   "main": "index.js",
   "scripts": {
-    "start":"node controllers/index.js",
-    "dev": "nodemon controllers/index.js",
+    "start":"node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mohan Prajapati",

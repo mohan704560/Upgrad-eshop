@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const express = require("express");
-const eshop_user = require("../models/usersSchema");
-const eshop = require("../models/productsSchema");
-const eshop_order = require("../models/ordersSchema");
-const eshop_shopping_address = require("../models/addressesSchema");
+const eshop_user = require("./models/usersSchema");
+const eshop = require("./models/productsSchema");
+const eshop_order = require("./models/ordersSchema");
+const eshop_shopping_address = require("./models/addressesSchema");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Auth = require("../middleware/auth");
+const Auth = require("./middleware/auth");
 const cookieParser = require("cookie-parser");
 
 mongoose
